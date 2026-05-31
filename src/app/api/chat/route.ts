@@ -11,7 +11,9 @@ import { PROJECTS, PRIORITIES } from "@/lib/tasks";
 
 export const maxDuration = 30;
 
-const MODEL = "anthropic/claude-sonnet-4.6";
+// Haiku 4.5 is available on the AI Gateway free tier and is strong at tool calling.
+// Switch to a Sonnet/Opus slug once the team has paid credits topped up.
+const MODEL = "anthropic/claude-haiku-4.5";
 
 const projectEnum = z.enum(PROJECTS);
 const priorityEnum = z.enum(PRIORITIES);

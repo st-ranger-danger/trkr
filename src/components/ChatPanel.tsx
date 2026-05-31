@@ -21,7 +21,7 @@ export default function ChatPanel({
   onOpenChange: (open: boolean) => void;
   onTasksChanged: () => void;
 }) {
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error, regenerate } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
     onFinish: () => onTasksChanged(),
   });
@@ -175,6 +175,22 @@ export default function ChatPanel({
           <div className="flex justify-start">
             <div className="rounded-2xl bg-[var(--surface-2)] px-3.5 py-2.5">
               <span className="trkr-pulse text-sm text-[var(--text-muted)]">…</span>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex justify-start">
+            <div className="max-w-[85%] rounded-2xl border border-[var(--danger)]/40 bg-[var(--danger)]/10 px-3.5 py-2.5 text-sm">
+              <p className="text-[var(--danger)]">
+                Something went wrong reaching the assistant.
+              </p>
+              <button
+                onClick={() => regenerate()}
+                className="mt-1.5 text-xs font-medium text-[var(--text-muted)] underline underline-offset-2 hover:text-[var(--text)]"
+              >
+                Try again
+              </button>
             </div>
           </div>
         )}
