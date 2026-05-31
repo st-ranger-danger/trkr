@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# trkr
 
-## Getting Started
+Personal task tracker with a built-in Claude assistant (chat + voice).
 
-First, run the development server:
+- **App:** Next.js 16 (App Router) + React 19 + Tailwind v4
+- **Data/Auth:** Supabase (Postgres + Auth — magic link & Google)
+- **AI:** Claude (`anthropic/claude-sonnet-4.6`) via Vercel AI Gateway, AI SDK v6 tool calling
+- **Voice:** Browser Web Speech API
+- **Hosting:** Vercel — production at https://trkr.st-range.dev
+
+The assistant can create, update, complete, delete, and query tasks in natural
+language (typed or spoken), and answer general questions.
+
+## Local development
 
 ```bash
+npm install
+vercel env pull .env.local   # pulls Supabase vars + VERCEL_OIDC_TOKEN for AI Gateway
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Sign in works locally out of the box (Supabase's default Site URL is `localhost:3000`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project resources
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Supabase project: `trkr` (`vapnikqefesbqukpqtdg`), org `st-range`
+- Vercel project: `trkr`, team `st-ranger-dangers-projects`
 
-## Learn More
+## Remaining setup (requires dashboard access)
 
-To learn more about Next.js, take a look at the following resources:
+1. **DNS (Cloudflare)** — add a record so `trkr.st-range.dev` resolves to Vercel:
+   `CNAME  trkr  →  cname.vercel-dns.com`  (or `A  trkr  →  76.76.21.21`).
+   Vercel verifies and issues SSL automatically.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Supabase Auth URLs** — Dashboard → Authentication → URL Configuration:
+   - Site URL: `https://trkr.st-range.dev`
+   - Redirect URLs: `https://trkr.st-range.dev/auth/callback`,
+     `http://localhost:3000/auth/callback`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **AI Gateway billing** — chat/voice need a credit card on file to unlock the free
+   monthly credits: https://vercel.com/st-ranger-dangers-projects/~/ai
 
-## Deploy on Vercel
+4. **Google sign-in (optional)** — add Google OAuth credentials in Supabase
+   (Authentication → Providers → Google). Magic-link login works without this.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Schema
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`public.tasks` — see the `create_tasks_table` migration. RLS grants the
+`authenticated` role full access (single-user app).
