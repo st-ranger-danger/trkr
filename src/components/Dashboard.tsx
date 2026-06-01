@@ -61,6 +61,34 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
     router.replace(`/?${next.toString()}`, { scroll: false });
   }
 
+  function handleStatClick(key: "open" | "critical" | "high" | "completed") {
+    const presets = {
+      open:      { status: "open",  priority: "all"      },
+      critical:  { status: "open",  priority: "critical" },
+      high:      { status: "open",  priority: "high"     },
+      completed: { status: "done",  priority: "all"      },
+    } as const;
+
+    const preset = presets[key];
+    const isActive =
+      key === "completed"
+        ? status === "done"
+        : status === preset.status && priority === preset.priority;
+
+    const next = new URLSearchParams(params.toString());
+    if (isActive) {
+      // Deselect → return to default (all open tasks)
+      next.delete("status");
+      next.delete("priority");
+    } else {
+      if (preset.status === "open") next.delete("status");
+      else next.set("status", preset.status);
+      if (preset.priority === "all") next.delete("priority");
+      else next.set("priority", preset.priority);
+    }
+    router.replace(`/?${next.toString()}`, { scroll: false });
+  }
+
   const visible = useMemo(() => {
     return tasks.filter((t) => {
       if (status === "open" && t.done) return false;
@@ -120,7 +148,11 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
         </div>
       </header>
 
-      <StatsBar tasks={tasks} />
+      <StatsBar
+        tasks={tasks}
+        activeFilter={{ status, priority }}
+        onStatClick={handleStatClick}
+      />
 
       <div className="mt-6 mb-3 flex items-center justify-between gap-3">
         <Filters
