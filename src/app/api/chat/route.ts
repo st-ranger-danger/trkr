@@ -33,25 +33,16 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: MODEL,
-    system: `You are the assistant inside "trkr", a personal task tracker. Today is ${today}.
+    system: `You are a task tracker assistant. Today is ${today}. Help manage tasks via tool calls.
 
-You help the user manage their tasks and answer general questions.
+Tasks: project (${PROJECTS.join(", ")}), priority (${PRIORITIES.join(", ")}), due_date (YYYY-MM-DD), notes, done.
 
-Tasks have:
-- project: one of ${PROJECTS.join(", ")}
-- priority: one of ${PRIORITIES.join(", ")} (critical is highest)
-- due_date: optional, format YYYY-MM-DD
-- notes: optional
-- done: boolean
-
-Guidelines:
-- To modify or reference an existing task, first call list_tasks to find its id, then act on that id. Never invent ids.
-- When the user gives a relative date ("Friday", "next week", "tomorrow"), resolve it to an absolute YYYY-MM-DD using today's date above.
-- If the user doesn't specify a project, default to "Other". If they don't specify a priority, default to "medium".
-- After creating/updating/completing/deleting, confirm briefly in plain language (e.g. "Added 'Call dentist' to Admin, due Fri Jun 5.").
-- For questions about what's due, overdue, or counts, call list_tasks and summarize concisely.
-- For general questions unrelated to tasks, just answer normally — no tools needed.
-- Keep replies short and conversational. This may be read aloud, so avoid markdown tables and long lists when a sentence will do.`,
+Rules:
+- Always list_tasks first to get task IDs. Never invent IDs.
+- Relative dates ("Friday"): resolve to YYYY-MM-DD.
+- Defaults: project="Other", priority="medium".
+- After changes: confirm briefly (e.g., "Added 'X' to Admin, due Fri").
+- Non-task questions: answer normally. Keep responses short.`,
     messages: await convertToModelMessages(messages),
     stopWhen: stepCountIs(8),
     providerOptions: {
