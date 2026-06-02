@@ -4,9 +4,11 @@ Personal task tracker with a built-in Claude assistant (chat + voice).
 
 - **App:** Next.js 16 (App Router) + React 19 + Tailwind v4
 - **Data/Auth:** Supabase (Postgres + Auth — magic link & Google)
-- **AI:** Claude (`anthropic/claude-sonnet-4.6`) via Vercel AI Gateway, AI SDK v6 tool calling
+- **AI:** Claude (`anthropic/claude-haiku-4.5`) via Vercel AI Gateway, AI SDK v6 tool calling
+  - ⚠️ Free tier only supports Haiku. To upgrade to Sonnet/Opus: add payment method to Vercel AI Gateway, then update `MODEL` in `src/app/api/chat/route.ts`
 - **Voice:** Browser Web Speech API
 - **Hosting:** Vercel — production at https://trkr.st-range.dev
+- **Code:** https://github.com/st-ranger-danger/trkr (auto-deploys on push to main)
 
 The assistant can create, update, complete, delete, and query tasks in natural
 language (typed or spoken), and answer general questions.
@@ -28,19 +30,25 @@ Sign in works locally out of the box (Supabase's default Site URL is `localhost:
 
 ## Remaining setup (requires dashboard access)
 
-1. **DNS (Cloudflare)** — add a record so `trkr.st-range.dev` resolves to Vercel:
+1. **GitHub → Vercel auto-deploy** — Link this repo to the Vercel project for automatic deployments:
+   - Vercel dashboard → Project `trkr` → Settings → Git
+   - Connect GitHub org `st-ranger-danger`, repo `trkr`
+   - Set production branch to `main`
+   - ✅ After linking, every push to main triggers a production deploy
+
+2. **DNS (Cloudflare)** — add a record so `trkr.st-range.dev` resolves to Vercel:
    `CNAME  trkr  →  cname.vercel-dns.com`  (or `A  trkr  →  76.76.21.21`).
    Vercel verifies and issues SSL automatically.
 
-2. **Supabase Auth URLs** — Dashboard → Authentication → URL Configuration:
+3. **Supabase Auth URLs** — Dashboard → Authentication → URL Configuration:
    - Site URL: `https://trkr.st-range.dev`
    - Redirect URLs: `https://trkr.st-range.dev/auth/callback`,
      `http://localhost:3000/auth/callback`
 
-3. **AI Gateway billing** — chat/voice need a credit card on file to unlock the free
+4. **AI Gateway billing** — chat/voice need a credit card on file to unlock the free
    monthly credits: https://vercel.com/st-ranger-dangers-projects/~/ai
 
-4. **Google sign-in (optional)** — add Google OAuth credentials in Supabase
+5. **Google sign-in (optional)** — add Google OAuth credentials in Supabase
    (Authentication → Providers → Google). Magic-link login works without this.
 
 ## Schema
